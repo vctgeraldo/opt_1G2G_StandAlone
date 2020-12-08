@@ -1,5 +1,5 @@
 #------------------------------------------------------------#
-#Title: Optimization of ...                                  #
+#Title: Optimization of a Stand Alone                        #
 #Authors:                                                    #
 #    1 - Jessica Marcon Bressanin                            #
 #    2 - Victor Coelho Geraldo                               #
