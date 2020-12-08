@@ -1,5 +1,5 @@
 #------------------------------------------------------------#
-#Title: Optimization of a Stand Alone                        #
+#Title: Optimization of a Stand Alone mill...                #
 #Authors:                                                    #
 #    1 - Jessica Marcon Bressanin                            #
 #    2 - Victor Coelho Geraldo                               #
