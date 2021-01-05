@@ -54,7 +54,7 @@ def co2AvoidedResult(CA,ECF,EU):
 #------------------------------------------------------------#
 
 #---IRR
-def irr(modelo,flag,Irr_sup):
+def irr(modelOpt,flag,Irr_sup):
 
     return (1.987347 + 0.652139 * modelOpt.CA - 0.215191 * modelOpt.CA * modelOpt.CA - 0.021653 * modelOpt.ECF \
             - 0.047731 * modelOpt.ECF * modelOpt.ECF - 0.000052 * modelOpt.EU - 0.054590 * modelOpt.EU * modelOpt.EU \
@@ -63,7 +63,7 @@ def irr(modelo,flag,Irr_sup):
 
 
 #---CO2 avoided
-def co2_avoid(modelo,flag,COdois_sup):
+def co2_avoid(modelOpt,flag,COdois_sup):
 
     return (26.64475 + 1.68662 * modelOpt.CA - 0.50258 * modelOpt.CA * modelOpt.CA + 0.28547 * modelOpt.ECF
             + 0.02429 * modelOpt.ECF * modelOpt.ECF - 2.54509 * modelOpt.EU + 0.53556 * modelOpt.EU * modelOpt.EU

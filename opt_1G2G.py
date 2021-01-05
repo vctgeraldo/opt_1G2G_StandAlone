@@ -33,15 +33,20 @@ import pandas as pd
 
 
 #---Irr
-def irr_resultado(CA,EC,EU):
-    return 8.903801 + 0.820775 * CA - 0.809301 * CA *CA - 0.637673 *EC \
-           - 0.087893 * EC * EC - 0.233889 * EU - 0.387459 *EU * EU \
-           - 0.213700 * CA * EC + 0.600275 *CA * EU + 0.339975 * EC * EU
+def irrResult(CA,ECF,EU):
+    return 8.903801 + 0.820775 * CA - 0.809301 * CA *CA - 0.637673 *ECF \
+           - 0.087893 * ECF * ECF - 0.233889 * EU - 0.387459 *EU * EU \
+           - 0.213700 * CA * ECF + 0.600275 *CA * EU + 0.339975 * ECF * EU
 #---Avoided CO2
-def co2_avoid_resultado(CA,EC,EU):
-    return 18.90206 + 0.83915 * CA - 0.37436 * CA * CA + 0.74775 *EC \
-           + 0.03957 * EC * EC - 1.00481 * EU + 0.01141 * EU * EU \
-           + 0.05126 * CA * EC + 0.42576 * CA * EU - 0.04161 * EC *EU
+def co2AvoidedResult(CA,ECF,EU):
+    return 18.90206 + 0.83915 * CA - 0.37436 * CA * CA + 0.74775 *ECF \
+           + 0.03957 * ECF * ECF - 1.00481 * EU + 0.01141 * EU * EU \
+           + 0.05126 * CA * ECF + 0.42576 * CA * EU - 0.04161 * ECF *EU
+
+#---Restriction function
+def restriction(CA,ECF,EU):
+    return 2.95291-3.29602*CA+1.75062*CA*CA -1.18355*ECF+0.03588*ECF*ECF+3.37391*EU\
+           +0.51318*EU*EU + 0.16250*CA*ECF  -2.18750*CA*EU  -0.61250*ECF*EU
 #------------------------------------------------------------#
 
 
@@ -51,28 +56,18 @@ def co2_avoid_resultado(CA,EC,EU):
 #------------------------------------------------------------#
 
 #---IRR
-def irr(modelo,flag,Irr_sup):
-    return (8.903801 + 0.820775 * modelo.CA - 0.809301 * modelo.CA * modelo.CA - 0.637673 * modelo.EC \
-           - 0.087893 * modelo.EC * modelo.EC - 0.233889 * modelo.EU - 0.387459 * modelo.EU * modelo.EU \
-           - 0.213700 * modelo.CA * modelo.EC + 0.600275 * modelo.CA * modelo.EU + 0.339975 * modelo.EC \
-           * modelo.EU)/Irr_sup
+def irr(modelOpt,flag,Irr_sup):
+    return (8.903801 + 0.820775 * modelOpt.CA - 0.809301 * modelOpt.CA * modelOpt.CA - 0.637673 * modelOpt.ECF \
+           - 0.087893 * modelOpt.ECF * modelOpt.ECF - 0.233889 * modelOpt.EU - 0.387459 * modelOpt.EU * modelOpt.EU \
+           - 0.213700 * modelOpt.CA * modelOpt.ECF + 0.600275 * modelOpt.CA * modelOpt.EU + 0.339975 * modelOpt.ECF \
+           * modelOpt.EU)/Irr_sup
 
 #---CO2 avoided
-def co2_avoid(modelo,flag,COdois_sup):
-    return (18.90206 + 0.83915 * modelo.CA - 0.37436 * modelo.CA * modelo.CA + 0.74775 * modelo.EC \
-           + 0.03957 * modelo.EC * modelo.EC - 1.00481 * modelo.EU + 0.01141 * modelo.EU * modelo.EU \
-           + 0.05126 * modelo.CA * modelo.EC + 0.42576 * modelo.CA * modelo.EU - 0.04161 * modelo.EC \
-          * modelo.EU)/COdois_sup
-
-#------------------------------------------------------------#
-#                    RESTRICTION FUNCTION                    #
-#------------------------------------------------------------#
-
-def restricao(CA,EC,EU):
-    return 2.95291-3.29602*CA+1.75062*CA*CA -1.18355*EC+0.03588*EC*EC+3.37391*EU\
-           +0.51318*EU*EU + 0.16250*CA*EC  -2.18750*CA*EU  -0.61250*EC*EU
-#-----------------------------------------------------------------
-
+def co2_avoid(modelOpt,flag,COdois_sup):
+    return (18.90206 + 0.83915 * modelOpt.CA - 0.37436 * modelOpt.CA * modelOpt.CA + 0.74775 * modelOpt.ECF \
+           + 0.03957 * modelOpt.ECF * modelOpt.ECF - 1.00481 * modelOpt.EU + 0.01141 * modelOpt.EU * modelOpt.EU \
+           + 0.05126 * modelOpt.CA * modelOpt.ECF + 0.42576 * modelOpt.CA * modelOpt.EU - 0.04161 * modelOpt.ECF \
+          * modelOpt.EU)/COdois_sup
 
 
 #------------------------------------------------------------#
@@ -86,42 +81,42 @@ def restricao(CA,EC,EU):
 #as the definition of the solver used in the optimization proce-
 #dure.
 
-def rodando_modelo(w, flag, Irr_sup,COdois_sup):
+def mainModel(w, flag, Irr_sup,COdois_sup):
 
     #---Defining the optimization model
-    modelo = ConcreteModel(name="(Jessica_doc)")
+    modelOpt = ConcreteModel(name="(Jessica_doc)")
     
 
     #---Instantiating the variables of the model, and their
     #respective baundaries
-    modelo.CA = Var(bounds=(-1.681792831, 1.681792831))
-    modelo.EC = Var(bounds=(-1.681792831, 1.681792831))
-    modelo.EU = Var(bounds=(-1.681792831, 1.681792831))
+    modelOpt.CA = Var(bounds=(-1.681792831, 1.681792831))
+    modelOpt.ECF = Var(bounds=(-1.681792831, 1.681792831))
+    modelOpt.EU = Var(bounds=(-1.681792831, 1.681792831))
 
     #Defining the restriction function. 
-    modelo.rest = Constraint(expr=2.95291-3.29602*modelo.CA+1.75062*modelo.CA*modelo.CA
-                         -1.18355*modelo.EC+0.03588*modelo.EC*modelo.EC+3.37391*modelo.EU
-                         +0.51318*modelo.EU*modelo.EU+0.16250*modelo.CA*modelo.EC
-                         -2.18750*modelo.CA*modelo.EU-0.61250*modelo.EC*modelo.EU >= 0.00001)
+    modelOpt.rest = Constraint(expr=2.95291-3.29602*modelOpt.CA+1.75062*modelOpt.CA*modelOpt.CA
+                         -1.18355*modelOpt.ECF+0.03588*modelOpt.ECF*modelOpt.ECF+3.37391*modelOpt.EU
+                         +0.51318*modelOpt.EU*modelOpt.EU+0.16250*modelOpt.CA*modelOpt.ECF
+                         -2.18750*modelOpt.CA*modelOpt.EU-0.61250*modelOpt.ECF*modelOpt.EU >= 0.00001)
 
 
     #Defining the objective function
 
     if flag ==1:
-        modelo.obj = Objective(expr=irr(modelo,flag,Irr_sup), sense=-1)
+        modelOpt.obj = Objective(expr=irr(modelOpt,flag,Irr_sup), sense=-1)
 
     if flag == 2:
-        modelo.obj = Objective(expr=co2_avoid(modelo,flag,COdois_sup), sense=-1)
+        modelOpt.obj = Objective(expr=co2_avoid(modelOpt,flag,COdois_sup), sense=-1)
 
     if flag == 3:
-        modelo.obj = Objective(expr=w * irr(modelo,flag,Irr_sup) \
-                     + (1.0 - w) * co2_avoid(modelo,flag,COdois_sup), sense=-1)
+        modelOpt.obj = Objective(expr=w * irr(modelOpt,flag,Irr_sup) \
+                     + (1.0 - w) * co2_avoid(modelOpt,flag,COdois_sup), sense=-1)
 
     #Solving the optmization model
     opt = SolverFactory('ipopt')
-    resultado = opt.solve(modelo)
+    resultado = opt.solve(modelOpt)
 
-    return modelo.CA.value, modelo.EC.value, modelo.EU.value
+    return modelOpt.CA.value, modelOpt.ECF.value, modelOpt.EU.value
 #----------------------------------------------------------------------------
 
 
@@ -132,13 +127,13 @@ def rodando_modelo(w, flag, Irr_sup,COdois_sup):
 if __name__ == "__main__":
 
     #----Superior limit of Irr-----------#
-    CA, EC, EU = rodando_modelo(1, 1, 1,1)
-    Irr_sup = irr_resultado(CA,EC,EU)
+    CA, ECF, EU = mainModel(1, 1, 1,1)
+    Irr_sup = irrResult(CA,ECF,EU)
     print(Irr_sup)
 
     # ----Superior limit of CO2-----------#
-    CA, EC, EU = rodando_modelo(1, 2, 1,1)
-    COdois_sup = co2_avoid_resultado(CA, EC, EU)
+    CA, ECF, EU = mainModel(1, 2, 1,1)
+    COdois_sup = co2AvoidedResult(CA, ECF, EU)
     print(COdois_sup)
 
 
@@ -172,25 +167,25 @@ if __name__ == "__main__":
     for w in val_w:
 
         #Running the model
-        CA, EC, EU = rodando_modelo(w, 3,Irr_sup,COdois_sup)
+        CA, ECF, EU = mainModel(w, 3,Irr_sup,COdois_sup)
 
         #--Storing the results of the optimization 
 	
         #---Coded variables 
         CA_lista.append( CA )
-        EC_lista.append(EC)
+        EC_lista.append(ECF)
         EU_lista.append(EU)
 
         #Objective function
-        irr_lista.append( irr_resultado(CA,EC,EU) )
-        co2_lista.append( co2_avoid_resultado(CA, EC, EU) )
+        irr_lista.append( irrResult(CA,ECF,EU) )
+        co2_lista.append( co2AvoidedResult(CA, ECF, EU) )
 
         #weight values
         w_irr.append(w)
         w_co2.append(1.0-w)
 
         #Restriction values
-        restricao_lista.append(restricao(CA, EC, EU))
+        restricao_lista.append(restriction(CA, ECF, EU))
 
         
         i += 1
@@ -202,7 +197,7 @@ if __name__ == "__main__":
 dt = {
 
     'CA' : CA_lista,
-    'EC' : EC_lista,
+    'ECF' : EC_lista,
     'EU' : EU_lista,
     'irr_obj': irr_lista,
     'CO2_obj': co2_lista,
