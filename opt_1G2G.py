@@ -214,8 +214,8 @@ pd.DataFrame(dt).to_csv('resultados.csv', sep = ';', index=False)
 
 #Generating graph with the pareto frontier
 plt.scatter(x = irr_lista, y= co2_lista)
-plt.title("Fronteira de Pareto para 10000 pontos")
-plt.ylabel("CO2 evitado")
+plt.title("Pareto frontier")
+plt.ylabel("CO2 evoided")
 plt.xlabel("IRR")
 plt.show()
 
